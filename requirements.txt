@@ -1,0 +1,2 @@
+# opshost 仅使用 Python 标准库，无第三方运行时依赖。
+# 要求 Python >= 3.10，Linux 内核（依赖 /proc 与 prctl PR_SET_CHILD_SUBREAPER）。

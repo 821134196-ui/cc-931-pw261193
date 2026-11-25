@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>opshost · 作业托管与实例身份</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">◈</span>
+    <div>
+      <h1>opshost</h1>
+      <p class="subtitle">本地运维作业托管 · 启动链与每代实例身份</p>
+    </div>
+  </div>
+  <div id="system-info" class="system-info"></div>
+</header>
+
+<nav class="tabs">
+  <button class="tab active" data-tab="live">真实本地作业</button>
+  <button class="tab" data-tab="sim">模拟演练</button>
+</nav>
+
+<!-- ===================== 真实作业 ===================== -->
+<section id="tab-live" class="tab-panel active">
+  <div class="panel-grid">
+    <aside class="col-jobs">
+      <div class="card">
+        <h2>作业定义</h2>
+        <form id="job-form" class="job-form">
+          <input type="text" id="job-name" placeholder="作业名称" required>
+          <textarea id="job-command" placeholder="shell 命令，如 sh /workspace/jobs/demo-job.sh" rows="3" required></textarea>
+          <input type="text" id="job-cwd" placeholder="工作目录（可选）">
+          <button type="submit" class="btn primary">创建作业</button>
+        </form>
+        <ul id="job-list" class="job-list"></ul>
+      </div>
+    </aside>
+
+    <main class="col-main">
+      <div class="card">
+        <div class="card-head">
+          <h2>轮次与归属树</h2>
+          <div class="head-actions">
+            <button id="btn-start-round" class="btn primary" disabled>启动新一轮</button>
+            <button id="btn-refresh" class="btn">刷新</button>
+          </div>
+        </div>
+        <p class="hint">实例身份 = <code>pid#start_time</code>。PID 可被复用，start_time 才区分每代实例。</p>
+        <div id="round-tabs" class="round-tabs"></div>
+        <div id="live-tree" class="tree-host">
+          <p class="empty">请在左侧选择一个作业，然后启动一轮真实本地作业。</p>
+        </div>
+        <div class="stop-bar">
+          <button id="btn-stop" class="btn danger" disabled>停止本轮（TERM→KILL，带身份复核）</button>
+          <button id="btn-stop-force" class="btn warn" disabled>强制停止（直接 KILL）</button>
+          <span id="stop-result" class="stop-result"></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>审计事件</h2>
+        <div id="live-events" class="event-log"></div>
+      </div>
+    </main>
+  </div>
+</section>
+
+<!-- ===================== 模拟演练 ===================== -->
+<section id="tab-sim" class="tab-panel">
+  <div class="panel-grid">
+    <aside class="col-jobs">
+      <div class="card">
+        <h2>演练动作</h2>
+        <p class="hint">在内存内核里确定性复现：父先退出留孤儿、PID 复用、同 PID 新进程保护。</p>
+        <div class="scenario-actions">
+          <button id="sim-new-round" class="btn primary">① 启动新轮次（根优先复用旧 PID）</button>
+          <button id="sim-spawn-worker" class="btn" disabled>② 派生 worker</button>
+          <button id="sim-spawn-pc" class="btn" disabled>③ 派生 父→子</button>
+          <button id="sim-parent-exit" class="btn warn" disabled>④ 父进程先退出</button>
+          <button id="sim-occupy" class="btn" disabled>⑤ 让无关进程占用已回收 PID</button>
+          <button id="sim-stop" class="btn danger" disabled>⑥ 停止轮次</button>
+        </div>
+        <h3>模拟内核状态</h3>
+        <div id="sim-kernel" class="kernel-state"></div>
+      </div>
+    </aside>
+
+    <main class="col-main">
+      <div class="card">
+        <div class="card-head">
+          <h2>归属树（含疑似与外来标注）</h2>
+          <button id="sim-refresh" class="btn">刷新</button>
+        </div>
+        <div id="sim-round-tabs" class="round-tabs"></div>
+        <div id="sim-tree" class="tree-host">
+          <p class="empty">点击「① 启动新轮次」开始演练。</p>
+        </div>
+        <div id="sim-action-result" class="stop-result"></div>
+      </div>
+      <div class="card">
+        <h2>审计事件</h2>
+        <div id="sim-events" class="event-log"></div>
+      </div>
+    </main>
+  </div>
+</section>
+
+<div id="toast" class="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>
